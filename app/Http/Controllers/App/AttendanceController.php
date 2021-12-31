@@ -82,7 +82,7 @@ class AttendanceController extends BaseController
         // Check today's attendance
         if ($working_attendance != null) {
             if ($working_attendance->status == "absent") {
-                return $this->handleError('You have been marked absent for today', '', 102);
+                return $this->handleResponse('', 'You have been marked absent for today', 103);
             }
             $working_attendance->clock_in = $cur_time;
             $working_attendance->clock_in_ip_address = $_SERVER['REMOTE_ADDR'];
@@ -134,6 +134,7 @@ class AttendanceController extends BaseController
 
     }
 
+    // check out for branch
     function checkOut()
     {
         // Creating date objects
@@ -177,12 +178,12 @@ class AttendanceController extends BaseController
         // Check today's attendance
         if ($working_attendance != null) {
             if ($working_attendance->status == "absent") {
-                return $this->handleError('You have been marked absent for today', '', 102);                
+                return $this->handleResponse('','You have been marked absent for today', '', 103);                
             }
             if ($working_attendance->clock_in != null) {
 
                 if ($working_attendance->clock_out != null) {
-                    return $this->handleError('Your attendance for today has already been marked', '', 103);
+                    return $this->handhandleResponseleError('','Your attendance for today has already been marked', '', 104);
                 }
                 $working_attendance->clock_out = $cur_time;
                 $working_attendance->clock_out_ip_address = $_SERVER['REMOTE_ADDR'];
@@ -194,12 +195,13 @@ class AttendanceController extends BaseController
                 return $this->handleResponse($data, 'Clock out time was set successfully');
             }
 
-            return $this->handleError('You have to clock in first', '', 103);
+            return $this->handleResponse('','You have to clock in first', '', 105);
         }
-        return $this->handleError('You have to clock in first', '', 103);
+        return $this->handleResponse('', 'You have to clock in first', '', 105);
 
     }
 
+    // event check in
     public function checkInEvent($note, $eventId)
     {
         $cur_time = $this->today->format('H:i:s');
@@ -210,7 +212,7 @@ class AttendanceController extends BaseController
                         ->where('event_id', $eventId)->first();
 
         if ($employeeEvent->clock_in != null) {
-            return $this->handleResponse('','Your already been check in');
+            return $this->handleResponse('','Your already been check in', 104);
         }else{
             $employeeEvent->date = $this->today->format("Y-m-d");
             $employeeEvent->clock_in = $cur_time;
@@ -219,9 +221,10 @@ class AttendanceController extends BaseController
         }
             $data = ['time' => $time, 'timeDiff' => $this->today->diffForHumans(), 'time_date' => $date_time];
 
-            return $this->handleResponse($data, 'You have successfully clocked in');
+            return $this->handleResponse($data, 'You have successfully clocked in', 100);
     }
 
+    // event check out
     function checkOutEvent($eventId)
     {
         $cur_time = $this->today->format('H:i:s');
@@ -233,7 +236,7 @@ class AttendanceController extends BaseController
                         ->where('event_id', $eventId)->first();
 
         if ($employeeEvent->clock_out != null) {
-            return $this->handleResponse('','Your already been check out');
+            return $this->handleResponse('','Your already been check out', 104);
         }else{
             $employeeEvent->date = $this->today->format("Y-m-d");
             $employeeEvent->clock_out = $cur_time;
@@ -241,7 +244,7 @@ class AttendanceController extends BaseController
         }
             $data = ['time' => $time, 'timeDiff' => $this->today->diffForHumans(), 'time_date' => $date_time];
 
-            return $this->handleResponse($data, 'You have successfully clocked Out');
+            return $this->handleResponse($data, 'You have successfully clocked Out', 100);
 
     }
 

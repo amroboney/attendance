@@ -18,6 +18,12 @@ class StatusController extends BaseController
                     101 => 'Check admin to activate device id ' ,
                     102 => 'Unauthorised' 
                 ],
+                'check' => [
+                    100 => 'You have successfully clocked in',
+                    103 => 'You have been marked absent for today',
+                    104 => 'Your attendance for today has already been marked',
+                    105 => 'You have to clock in first'
+                ]
             ],
 
             "parameter" => [
