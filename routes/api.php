@@ -16,4 +16,6 @@ Route::group(['prefix' => 'app', 'namespace' => 'App', 'middleware' => 'auth:api
     Route::post('/checkOutEvent', 'EventAttendanceController@checkOut');
     Route::get('/getEvents', 'EventAttendanceController@getEvents');
     Route::post('/check', 'AttendanceController@check');
+
+    Route::get('resetAttendance', 'AttendanceController@reset');
 });

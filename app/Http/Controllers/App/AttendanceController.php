@@ -279,4 +279,16 @@ class AttendanceController extends BaseController
         return $start;
     }
 
+
+    public function reset()
+    {
+        try {
+            $attendance = Attendance::where('employee_id', Auth::user()->id)
+                        ->whereDate('date',$this->today)->firstOrFail();
+            $attendance->delete();
+            return $this->handleResponse('', 'deleted attendance for today', 100);
+        } catch (\Throwable $th) {
+            return $this->handleResponse('', 'you dont have attendance for today', 106);
+        }
+    }
 }

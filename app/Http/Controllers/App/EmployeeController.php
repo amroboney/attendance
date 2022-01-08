@@ -69,7 +69,7 @@ class EmployeeController extends BaseController
     // get attendance 
     public function getAttendance()
     {
-        $this->employee->id = Auth::user()->id;
+        $this->employee = Auth::user();
         $attendance = Attendance::where('created_at',  '>', now()->subDays(30)->endOfDay())
             ->where('employee_id', '=', $this->employee->id)
             ->orderBy('date')
