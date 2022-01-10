@@ -31,12 +31,13 @@ class EmployeeController extends BaseController
             $this->employee = Auth::user();
             $this->getBranch();
             $this->getEvents();
-
+            $data['today_attendance'] = null;
             $attendance = Attendance::where('employee_id', $this->employee->id)->whereDate('created_at', $this->today)->exists();
             if ($attendance) {
-                $attendance = Attendance::where('employee_id', $this->employee->id)->whereDate('created_at', $this->today)->first();
+                $attendances = Attendance::where('employee_id', $this->employee->id)->whereDate('created_at', $this->today)->first();
+                $data['today_attendance'] = $attendances;
             }
-            $data['today_attendance'] = $attendance;
+            $data['status_attendance'] = $attendance;
             $this->attendanceActive = 'active';        
 
             $timeZone = Company::find(Auth::user()->company_id)->timezone;
