@@ -68,7 +68,7 @@ class LoginController extends BaseController
     // check the device id exist or not and update the new
     public function checkDeviceId($deviceId) : void
     {
-        if ($this->employee->device_id == null) {
+        if ($this->employee->device_id == null || $this->employee->device_id != $deviceId ) {
             $employee = Employee::find($this->employee->id);
             $employee->device_id = $deviceId;
             $employee->device_status = 0;

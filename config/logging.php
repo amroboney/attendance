@@ -53,6 +53,12 @@ return [
             'channels' => ['single'],
             'ignore_exceptions' => false,
         ],
+        'testApi' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/testApi.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+        ],
 
         'single' => [
             'driver' => 'single',
