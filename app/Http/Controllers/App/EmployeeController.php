@@ -24,6 +24,7 @@ class EmployeeController extends BaseController
  
     public function getUserData()
     {
+        
         $this->today = $this->today->format("Y-m-d");
         try {
             $data = [];
@@ -31,6 +32,7 @@ class EmployeeController extends BaseController
             $this->employee = Auth::user();
             $this->getBranch();
             $this->getEvents();
+            
             $data['today_attendance'] = null;
             $attendance = Attendance::where('employee_id', $this->employee->id)->whereDate('created_at', $this->today)->exists();
             if ($attendance) {
@@ -49,6 +51,7 @@ class EmployeeController extends BaseController
             $data['branch_name'] = $this->branch->name;
             $data['area'] = $this->branch->area;
             $data['branch_coordinate'] = $this->branch->lat. ','. $this->branch->lng;
+            $data['event_status'] = $this->checkEvent();
             $data['events'] = $this->events;
 
             $ip_address = $_SERVER['REMOTE_ADDR'];
@@ -81,9 +84,14 @@ class EmployeeController extends BaseController
     // get active event
     public function getEvents() : void
     {
-        $this->events =  $events = EmployeeEvent::with('events')->whereHas('events', function($event) {
+        $this->events = EmployeeEvent::with('events')->whereHas('events', function($event) {
             $event->whereDate('date', '>=', $this->today);
         })->where('employee_id', $this->employee->id)->get();
+    }
+
+    public function checkEvent(){
+        $eventCount = count($this->events);
+        if ($eventCount != 0) {return true;} else {return false;};
     }
 
 
