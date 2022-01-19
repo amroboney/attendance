@@ -11,88 +11,70 @@ use Illuminate\Http\Request;
 use App\Models\EmployeeEvent;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\App\BaseController;
+use App\Http\Controllers\App\EventController;
+use App\Http\Controllers\App\LeaveController;
+use App\Http\Controllers\App\BranchController;
 use App\Http\Controllers\App\FrontBaseController;
 
 class EmployeeController extends BaseController
 {
     public $employee;
-    public $setting;
-    public $branch;
-    public $events;
-
-    
+    // public $branch;    
  
     public function getUserData()
     {
-        
         $this->today = $this->today->format("Y-m-d");
-        try {
-            $data = [];
-            $data['today'] = $this->today;
+        // try {
+            // $this->today = $this->today;
             $this->employee = Auth::user();
-            $this->getBranch();
-            $this->getEvents();
+
+            // get Branch data
+            $branch = new BranchController();
+            $newBranch = $branch->getBranch($this->employee->branch_id);
+
+            $this->branch_id            = $newBranch->id;
+            $this->branch_name          = $newBranch->name;
+            $this->area                 = $newBranch->area;
+            $this->branch_coordinate    = $newBranch->lat. ','. $newBranch->lng;
+
+            // return today attedance
+            $attendance = new AttendanceController();
+            $this->status_attendance = $attendance->checkTodayAttendance($this->employee->id);
+            $this->today_attendance  = $attendance->getTodayAttendance($this->employee->id);
             
-            $data['today_attendance'] = null;
-            $attendance = Attendance::where('employee_id', $this->employee->id)->whereDate('created_at', $this->today)->exists();
-            if ($attendance) {
-                $attendances = Attendance::where('employee_id', $this->employee->id)->whereDate('created_at', $this->today)->first();
-                $data['today_attendance'] = $attendances;
-            }
-            $data['status_attendance'] = $attendance;
-            $this->attendanceActive = 'active';        
-
+            // return time zone and local time
             $timeZone = Company::find(Auth::user()->company_id)->timezone;
-            $data['timeZone'] = $timeZone;
+            $this->timeZone = $timeZone;
             $local_time = Carbon::now(new \DateTimeZone($timeZone));
-            $data['local_time'] = $local_time;
+            $this->local_time = $local_time;
 
-            $data['branch_id'] = $this->branch->id;
-            $data['branch_name'] = $this->branch->name;
-            $data['area'] = $this->branch->area;
-            $data['branch_coordinate'] = $this->branch->lat. ','. $this->branch->lng;
-            $data['event_status'] = $this->checkEvent();
-            $data['events'] = $this->events;
+            // get events 
+            $event = new EventController();
+            $this->events = $event->getActiveEvents($this->employee->id);
+            $this->event_status = $event->checkEvent($this->employee->id);
+            
+            // get leave data 
+            $leaveType = new LeaveController();
+            $this->leaveTypes = $leaveType->getData();
+            $this->leave_statue = $leaveType->checkLeave();
 
             $ip_address = $_SERVER['REMOTE_ADDR'];
-            return $this->handleResponse($data, 'attendance data');
-        } catch (\Throwable $th) {
-            $this->setLog('login funciton', $th);
-            return $this->handleError('System Error', '', 400);
-        }
+            return $this->handleResponse($this->data, 'attendance data');
+        // } catch (\Throwable $th) {
+        //     $this->setLog('login funciton', $th);
+        //     return $this->handleError('System Error', '', 400);
+        // }
         
     }
 
 
-    // get branch
-    public function getBranch() : void
-    {
-        $this->branch =  Branch::find($this->employee->branch_id);
-    }
     
-    // get attendance 
-    public function getAttendance()
-    {
-        $this->employee = Auth::user();
-        $attendance = Attendance::where('created_at',  '>', now()->subDays(30)->endOfDay())
-            ->where('employee_id', '=', $this->employee->id)
-            ->orderBy('date')
-            ->get();
-        return $this->handleResponse($attendance, 'attendance data');
-    }
+    
+    
 
-    // get active event
-    public function getEvents() : void
-    {
-        $this->events = EmployeeEvent::with('events')->whereHas('events', function($event) {
-            $event->whereDate('date', '>=', $this->today);
-        })->where('employee_id', $this->employee->id)->get();
-    }
+    
 
-    public function checkEvent(){
-        $eventCount = count($this->events);
-        if ($eventCount != 0) {return true;} else {return false;};
-    }
+    
 
 
 }

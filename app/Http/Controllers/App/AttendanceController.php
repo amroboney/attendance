@@ -291,4 +291,30 @@ class AttendanceController extends BaseController
             return $this->handleResponse('', 'you dont have attendance for today', 106);
         }
     }
+
+
+    // get attendance for last 30 days
+    public function getAttendance()
+    {
+        $employeeId = Auth::user()->id;
+        $attendance = Attendance::where('created_at',  '>', now()->subDays(30)->endOfDay())
+            ->where('employee_id', '=', $employeeId)
+            ->orderBy('date')
+            ->get();
+        return $this->handleResponse($attendance, 'attendance data');
+    }
+
+
+    // check today attendance
+    public function checkTodayAttendance($empId)
+    {
+        return Attendance::where('employee_id', $empId)->whereDate('created_at', $this->today)->exists();  
+    }
+
+    public function getTodayAttendance($empId)
+    {
+        return Attendance::where('employee_id', $empId)->whereDate('created_at', $this->today)->first();
+    }
+
+
 }
