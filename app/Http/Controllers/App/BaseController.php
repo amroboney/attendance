@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
+use DateTime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -68,7 +69,7 @@ class BaseController extends Controller
             'responseDescription'   => $error,
         ];
         if(!empty($errorMsg)){
-            $res['data'] = $errorMsg;
+            $res['errors'] = $errorMsg;
         }
         return response()->json($res);
     }
@@ -77,5 +78,14 @@ class BaseController extends Controller
     {
         \Log::info($functionType);
         \Log::info($error);
+    }
+
+    // calclaute days between 2 date
+    public function calcluateDays($startDate, $endDate)
+    {
+        $datetime1 = new DateTime($startDate);
+        $datetime2 = new DateTime($endDate);
+        $interval = $datetime1->diff($datetime2);
+        return $days = $interval->format('%a');//now do whatever you like with $days
     }
 }

@@ -13,6 +13,7 @@ class StatusController extends BaseController
         $this->status = [
             "status" => [
                 100 => 'Successfully',
+                107 => 'Inpute Validation Error',
                 'login status' => [
                     100 => 'Successfully',
                     101 => 'Check admin to activate device id ' ,
@@ -29,6 +30,9 @@ class StatusController extends BaseController
 
             "parameter" => [
                 "checkType" => ["checkIn","checkOut","checkInEvent", "checkOutEvent"],
+                "leaveformType" => ["single_leaves","date_range"],
+                "halfleaveType" => ["yes","no"],
+                "application_status" => ['pending','approved','rejected'],
             ]
            
 
