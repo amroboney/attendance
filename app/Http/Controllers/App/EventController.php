@@ -52,6 +52,7 @@ class EventController extends BaseController
 
     public function mapingEvents($activeEvents)
     {
+        $events = [];
         foreach ($activeEvents as $key => $event) {
             $arrEvent['id']            = $event->id;
             $arrEvent['event_id']      = $event->event_id;

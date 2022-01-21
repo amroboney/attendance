@@ -18,7 +18,7 @@ class LeaveController extends BaseController
     public function getData() 
     {
         $this->companyId = Auth::user()->company_id;
-        return Leavetype::where('company_id', $this->companyId)->pluck('leaveType','leaveType');
+        return Leavetype::where('company_id', $this->companyId)->pluck('leaveType');
         // return $this->leaveTypes;
     }
 
