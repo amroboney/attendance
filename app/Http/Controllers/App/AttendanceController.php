@@ -19,17 +19,22 @@ class AttendanceController extends BaseController
 
     public function check(Request $request)
     {
-        $this->employeeID = Auth::user()->id;
-        $this->company = Company::find(Auth::user()->company_id);
+        try {
+            $this->employeeID = Auth::user()->id;
+            $this->company = Company::find(Auth::user()->company_id);
 
-        if ($request->checkType === 'checkIn') {
-            return $this->checkIn($request->note, $request->pleaceId);
-        }else if ($request->checkType === 'checkOut') {
-            return $this->checkOut();
-        }else if($request->checkType === 'checkInEvent'){
-            return $this->checkInEvent($request->note, $request->pleaceId);
-        }else if($request->checkType === 'checkOutEvent'){
-            return $this->checkOutEvent($request->pleaceId);
+            if ($request->checkType === 'checkIn') {
+                return $this->checkIn($request->note, $request->pleaceId);
+            }else if ($request->checkType === 'checkOut') {
+                return $this->checkOut();
+            }else if($request->checkType === 'checkInEvent'){
+                return $this->checkInEvent($request->note, $request->pleaceId);
+            }else if($request->checkType === 'checkOutEvent'){
+                return $this->checkOutEvent($request->pleaceId);
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return $this->handleError('System Error', $errorMsg = [$th], $code = 120);
         }
     }
 
@@ -202,15 +207,15 @@ class AttendanceController extends BaseController
     }
 
     // event check in
-    public function checkInEvent($note, $eventId)
+    public function checkInEvent($note, $eventEmpId)
     {
         $cur_time = $this->today->format('H:i:s');
         $time = Carbon::now()->timezone($this->company->timezone)->format('h:i A');
         $date_time = Carbon::now()->timezone($this->company->timezone)->format("Y-m-d H:i:s");
 
-        $employeeEvent = EmployeeEvent::where('employee_id', $this->employeeID)
-                        ->where('event_id', $eventId)->first();
-
+        // $employeeEvent = EmployeeEvent::where('employee_id', $this->employeeID)
+        //                 ->where('event_id', $eventId)->first();
+        $employeeEvent = EmployeeEvent::find($eventEmpId);
         if ($employeeEvent->clock_in != null) {
             return $this->handleResponse('','Your already been check in', 104);
         }else{
