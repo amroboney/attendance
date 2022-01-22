@@ -213,9 +213,9 @@ class AttendanceController extends BaseController
         $time = Carbon::now()->timezone($this->company->timezone)->format('h:i A');
         $date_time = Carbon::now()->timezone($this->company->timezone)->format("Y-m-d H:i:s");
 
-        // $employeeEvent = EmployeeEvent::where('employee_id', $this->employeeID)
-        //                 ->where('event_id', $eventId)->first();
-        $employeeEvent = EmployeeEvent::find($eventEmpId);
+        $employeeEvent = EmployeeEvent::where('employee_id', $this->employeeID)
+                        ->where('event_id', $eventId)->first();
+        // $employeeEvent = EmployeeEvent::find($eventEmpId);
         if ($employeeEvent->clock_in != null) {
             return $this->handleResponse('','Your already been check in', 104);
         }else{
